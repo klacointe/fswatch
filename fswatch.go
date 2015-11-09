@@ -269,13 +269,21 @@ var (
 	}
 	confExists = false
 	extInclude string
+	configPath string
 )
 
 // parse command flag
 func flagParse() {
 	gw.Env = map[string]string{"POWERD_BY": "github.com/codeskyblue/fswatch"}
+	flag.DurationVar(&gw.RestartInterval, "ri", gw.RestartInterval, "restart interval")
+	flag.BoolVar(&gw.AutoRestart, "r", gw.AutoRestart, "auto restart")
+	flag.StringVar(&gw.KillSignal, "k", gw.KillSignal, "kill signal")
+	flag.StringVar(&extInclude, "ext", "", "extention eg: [cpp,c,h]")
+	flag.StringVar(&configPath, "c", ".fswatch.json", "configuration path")
+	flag.Parse()
+
 	// load JSONCONF
-	if fd, err := os.Open(JSONCONF); err == nil {
+	if fd, err := os.Open(configPath); err == nil {
 		if er := json.NewDecoder(fd).Decode(gw); er != nil {
 			log.Fatalf("json decode error: %v", er)
 		}
@@ -284,11 +292,6 @@ func flagParse() {
 		}
 		confExists = true
 	}
-	flag.DurationVar(&gw.RestartInterval, "ri", gw.RestartInterval, "restart interval")
-	flag.BoolVar(&gw.AutoRestart, "r", gw.AutoRestart, "auto restart")
-	flag.StringVar(&gw.KillSignal, "k", gw.KillSignal, "kill signal")
-	flag.StringVar(&extInclude, "ext", "", "extention eg: [cpp,c,h]")
-	flag.Parse()
 }
 
 func main() {
